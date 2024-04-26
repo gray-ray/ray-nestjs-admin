@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleController } from './role.controller';
-import { MyLogger } from 'middlewares/my-logger.service';
+import { MyLogger } from 'core/middlewares/my-logger.service';
 import { Role } from './entities/role.entity';
 import { User } from 'src/user/entities/user.entity';
 

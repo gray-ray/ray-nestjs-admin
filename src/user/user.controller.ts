@@ -1,5 +1,11 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
-
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  ParseIntPipe,
+  Param,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, QueryUserDto, UpdateUserDto } from './dto/user.dto';
 
@@ -17,8 +23,8 @@ export class UserController {
     return this.userService.getPage(queryUserDto);
   }
 
-  @Get('detail')
-  detail(@Query('id') id: number) {
+  @Get('detail/:id')
+  detail(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findOne(id);
   }
 
@@ -27,8 +33,8 @@ export class UserController {
     return this.userService.update(updateUserDto);
   }
 
-  @Get('delete')
-  delete(@Query('id') id: number) {
+  @Get('delete/:id')
+  delete(@Param('id', ParseIntPipe) id: number) {
     return this.userService.remove(id);
   }
 }

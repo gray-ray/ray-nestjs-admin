@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Query ,ParseIntPipe} from '@nestjs/common';
 import { RoleService } from './role.service';
 
 import { CreateRoleDto, UpdateRoleDto, QueryRoleDto } from './dto/role.dto';
@@ -17,8 +17,8 @@ export class RoleController {
     return this.roleService.getPage(queryUserDto);
   }
 
-  @Get('detail')
-  detail(@Query('id') id: number) {
+  @Get('detail/:id')
+  detail(@Param('id', ParseIntPipe) id: number) {
     return this.roleService.findOne(id);
   }
 
@@ -27,8 +27,8 @@ export class RoleController {
     return this.roleService.update(updateUserDto);
   }
 
-  @Get('delete')
-  delete(@Query('id') id: number) {
+  @Get('delete/:id')
+  delete(@Query('id', ParseIntPipe) id: number) {
     return this.roleService.remove(id);
   }
 }

@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, TreeRepository } from 'typeorm';
 import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto';
-import { MyLogger } from 'middlewares/my-logger.service';
+import { MyLogger } from 'core/middlewares/my-logger.service';
 import { Menu } from './entities/menu.entity';
 
 @Injectable()

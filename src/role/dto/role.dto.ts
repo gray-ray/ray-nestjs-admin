@@ -4,10 +4,10 @@ import { PartialType, PickType, OmitType } from '@nestjs/mapped-types';
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateRoleDto {
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'roleName 字段不能为空' })
   roleName: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'code 字段不能为空' })
   code: string;
 
   status: boolean;
@@ -26,7 +26,7 @@ export class QueryRoleDto extends PartialType(CreateRoleDto) {
 }
 
 export class UpdateRoleDto extends PartialType(CreateRoleDto) {
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'id 字段不能为空' })
   @IsNumber()
   id: number;
 }

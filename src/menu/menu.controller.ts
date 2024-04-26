@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Query, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Query, Delete, ParseIntPipe,Param } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { CreateMenuDto, UpdateMenuDto, QueryMenuDto } from './dto/menu.dto';
 
@@ -17,8 +17,8 @@ export class MenuController {
     return this.menuService.getTrees();
   }
 
-  @Get('detail')
-  detail(@Query('id') id: number) {
+  @Get('detail/:id')
+  detail(@Param('id', ParseIntPipe) id: number) {
     return this.menuService.findOne(id);
   }
 
@@ -27,8 +27,8 @@ export class MenuController {
     return this.menuService.update(updateMenuDto);
   }
 
-  @Get('delete')
-  delete(@Query('id') id: number) {
+  @Get('delete/:id')
+  delete(@Param('id') id: number) {
     return this.menuService.remove(id);
   }
 }

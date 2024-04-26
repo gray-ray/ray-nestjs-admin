@@ -8,7 +8,7 @@ import {
 import { Repository, TreeRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Application } from './entities/application.entity';
-import { MyLogger } from 'middlewares/my-logger.service';
+import { MyLogger } from 'core/middlewares/my-logger.service';
 import { Menu } from 'src/menu/entities/menu.entity';
 
 @Injectable()

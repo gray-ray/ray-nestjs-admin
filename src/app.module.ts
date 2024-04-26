@@ -2,14 +2,16 @@ import { Module, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import envConfig from '../config/env';
+import { APP_FILTER, APP_PIPE, APP_INTERCEPTOR } from '@nestjs/core';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
 import { MenuModule } from './menu/menu.module';
-import { DictModule } from './dict/dict.module';
 import { ApplicationModule } from './application/application.module';
+
+import { HttpExceptionFilter } from 'core/filters/http-exception.filter';
+import { ValidationPipe } from 'core/pipes/validate.pipe';
+import { ResponseInterceptor } from 'core/interceptor/response.interceptor';
 
 // 全局模块 在根模引入后， 在其他模块使用userModule 不在需要在其他模块中导入userModule
 // imports 是最优的
@@ -41,10 +43,22 @@ import { ApplicationModule } from './application/application.module';
     UserModule,
     RoleModule,
     MenuModule,
-    DictModule,
     ApplicationModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+  ],
 })
 export class AppModule {}

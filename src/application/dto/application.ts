@@ -3,7 +3,7 @@ import { PartialType, PickType } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
 export class CreateApplicationDto {
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'appName字段不能为空' })
   appName: string;
 }
 

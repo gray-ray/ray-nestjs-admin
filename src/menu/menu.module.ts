@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MenuService } from './menu.service';
 import { MenuController } from './menu.controller';
 import { Menu } from './entities/menu.entity';
-import { MyLogger } from 'middlewares/my-logger.service';
+import { MyLogger } from 'core/middlewares/my-logger.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Menu])],
