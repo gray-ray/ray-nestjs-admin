@@ -1,5 +1,4 @@
-import { Column, PrimaryGeneratedColumn, Entity } from 'typeorm';
-
+import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from 'typeorm';
 @Entity('applications')
 export class Application {
   @PrimaryGeneratedColumn('increment')

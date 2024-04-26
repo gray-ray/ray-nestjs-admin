@@ -1,12 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, TreeRepository } from 'typeorm';
-import {
-  CreateMenuDto,
-  UpdateMenuDto,
-  QueryMenuDto,
-  MenuDto,
-} from './dto/menu.dto';
+import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto';
 import { MyLogger } from 'middlewares/my-logger.service';
 import { Menu } from './entities/menu.entity';
 
@@ -61,6 +56,7 @@ export class MenuService {
       status,
       route,
       appId,
+      parentId,
     });
 
     if (has) {
@@ -81,7 +77,7 @@ export class MenuService {
     const menu = new Menu();
     menu.id = id;
 
-    // TODO: 2次查询组装，性能不知道怎么样 暂时没有其他方法
+    // TODO: 2次查询组装，性能不是很好 暂时没有其他方法
     const current = await this.menuRepository.findOne({ where: { id } });
 
     if (!current) {
@@ -116,7 +112,9 @@ export class MenuService {
       throw new HttpException('菜单不存在', HttpStatus.OK);
     }
 
-    const newMenu = this.menuRepository.merge(exitsMenu, updateMenu);
+    const newMenu = this.menuRepository.merge(exitsMenu, {
+      ...updateMenu,
+    });
 
     const res = await this.menuRepository.save(newMenu);
 

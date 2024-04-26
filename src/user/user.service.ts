@@ -5,7 +5,6 @@ import { CreateUserDto, UpdateUserDto, QueryUserDto } from './dto/user.dto';
 import { MyLogger } from 'middlewares/my-logger.service';
 import { User } from './entities/user.entity';
 
-import { RoleService } from 'src/role/role.service';
 import { Role } from 'src/role/entities/role.entity';
 
 @Injectable()
@@ -41,18 +40,16 @@ export class UserService {
       roles = await this.roleRepository.findBy({ id: In(roleIds) });
     }
 
-   
     const params = {
       roles,
       username,
       ...reset,
     };
 
-    
     const newUser = await this.userRepository.create(params);
 
     const res = await this.userRepository.save(newUser);
-  
+
     if (res) {
       this.myLogger.log('用户创建成功');
     }

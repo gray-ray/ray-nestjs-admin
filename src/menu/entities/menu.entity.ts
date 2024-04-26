@@ -3,12 +3,14 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   BeforeInsert,
-  OneToMany,
   TreeChildren,
   TreeParent,
   Tree,
   TreeLevelColumn,
+  ManyToOne,
 } from 'typeorm';
+
+import { Application } from 'src/application/entities/application.entity';
 
 // 树实体
 @Entity('menus')
@@ -52,12 +54,20 @@ export class Menu {
   })
   updateTime: Date;
 
-  @Column({ name: 'app_id' })
-  appId: number;
-
   @TreeParent()
   parent: Menu;
 
   @TreeChildren()
   children: Menu[];
+
+  @Column({
+    name: 'app_id',
+  })
+  appId: number;
+
+  @Column({
+    name: 'parent_id',
+    default: 0,
+  })
+  parentId: number;
 }

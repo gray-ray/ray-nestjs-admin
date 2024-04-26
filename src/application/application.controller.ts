@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import {
   CreateApplicationDto,
@@ -29,8 +21,13 @@ export class ApplicationController {
   }
 
   @Get('all')
-  getAll(@Param('name') name: string) {
+  getAll(@Query('name') name: string) {
     return this.applicationService.getAll(name);
+  }
+
+  @Get('menus')
+  getMenusTree(@Query('appId') appId: number) {
+    return this.applicationService.getMenusTree(appId);
   }
 
   @Post('update')
@@ -39,7 +36,7 @@ export class ApplicationController {
   }
 
   @Get('remove')
-  remove(@Param('id') id: number) {
+  remove(@Query('id') id: number) {
     return this.applicationService.remove(id);
   }
 }

@@ -5,16 +5,19 @@ import {
   UpdateApplicationDto,
 } from './dto/application';
 
-import { Repository } from 'typeorm';
+import { Repository, TreeRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Application } from './entities/application.entity';
 import { MyLogger } from 'middlewares/my-logger.service';
+import { Menu } from 'src/menu/entities/menu.entity';
 
 @Injectable()
 export class ApplicationService {
   constructor(
     @InjectRepository(Application)
     private readonly appRepository: Repository<Application>,
+    @InjectRepository(Menu)
+    private readonly menuRepository: Repository<Menu>,
     private readonly myLogger: MyLogger,
   ) {
     this.myLogger.setContext('appService');
@@ -61,6 +64,46 @@ export class ApplicationService {
   async getAll(appName?: string) {
     const res = await this.appRepository.find({ where: { appName } });
     return res;
+  }
+
+  async getMenusTree(id: number) {
+    const exitsApp = await this.appRepository.findOne({ where: { id } });
+
+    if (!exitsApp) {
+      throw new HttpException('应用名称不存在', HttpStatus.OK);
+    }
+
+    const queryBuilder = this.menuRepository.createQueryBuilder('menus');
+    const res = await queryBuilder
+      .where('menus.appId = :appId', { appId: id })
+      .getMany();
+
+    return this.flat2Tree(res);
+  }
+
+  treeAdd(list: Menu[], item: Menu) {
+    for (let i = 0, len = list?.length; i < len; i++) {
+      if (list[i]?.id === item.parentId) {
+        list[i].children?.push(item);
+        return;
+      }
+      if (list[i].children?.length > 0) {
+        this.treeAdd(list[i].children, item);
+      }
+    }
+  }
+
+  flat2Tree(list: Menu[]) {
+    const final = [];
+    list?.concat()?.forEach((o) => {
+      o.children = [];
+      if (final?.length === 0 || o?.parentId === 0) {
+        final.push(o);
+        return;
+      }
+      this.treeAdd(final, o);
+    });
+    return final;
   }
 
   async update(updateApp: UpdateApplicationDto) {

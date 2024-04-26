@@ -2,7 +2,6 @@ import { PartialType } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateMenuDto {
-
   menuName: string;
 
   type: string;
@@ -12,7 +11,6 @@ export class CreateMenuDto {
   component: string;
 
   route: string;
-
 
   status: boolean;
 
