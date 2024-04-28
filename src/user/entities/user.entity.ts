@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Role } from 'src/role/entities/role.entity';
 import { Exclude } from 'class-transformer';
+import { hashSync } from 'bcryptjs';
 
 @Entity('users')
 export class User {
@@ -56,4 +57,10 @@ export class User {
     name: 'users_roles',
   })
   roles: Role[];
+
+  @BeforeInsert()
+  async encryptPwd() {
+    if (!this.password) return;
+    this.password = hashSync(this.password, 10);
+  }
 }
