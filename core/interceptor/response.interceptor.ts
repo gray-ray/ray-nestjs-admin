@@ -15,6 +15,16 @@ export class ResponseInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
+    // NOTE: 返回原始数据结构不进行 RESTful处理
+    const isCustomResponse = Reflect.getMetadata(
+      'customResponse',
+      context.getHandler(),
+    );
+
+    if (isCustomResponse) {
+      return next.handle();
+    }
+
     return next.handle().pipe(
       map((data) => {
         return {

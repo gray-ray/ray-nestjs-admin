@@ -19,6 +19,8 @@ export class CreateUserDto {
 
   phone: string;
 
+  remark: string;
+
   roleIds: number[];
 }
 

@@ -80,6 +80,19 @@ export class UserService {
     return res;
   }
 
+  // 返回用户密码信息
+  async findOneByName(username: string) {
+    const qb = await this.userRepository
+      .createQueryBuilder('users')
+      .addSelect('users.password')
+      .where('users.username = :username', { username })
+      .getOne();
+
+    if (!qb) return undefined;
+
+    return qb;
+  }
+
   async update(updateUser: UpdateUserDto) {
     const { id } = updateUser;
 

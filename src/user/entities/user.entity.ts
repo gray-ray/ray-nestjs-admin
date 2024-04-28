@@ -48,6 +48,9 @@ export class User {
   @Column({ length: 11 })
   phone: string;
 
+  @Column()
+  remark: string;
+
   @ManyToMany(() => Role, (role) => role.users, { lazy: true })
   @JoinTable({
     name: 'users_roles',

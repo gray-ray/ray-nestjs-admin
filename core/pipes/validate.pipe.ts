@@ -19,12 +19,15 @@ export class ValidationPipe implements PipeTransform<any> {
       return value;
     }
     const object = plainToInstance(metatype, value);
+    // TODO: 不生效
+    // skipMissingProperties 选项来指定只对有值的属性进行校验。这样，如果属性为 undefined 或 null
+    //  const errors = await validate(object, { skipMissingProperties: true });
     const errors = await validate(object);
     console.log('触发全局管道校验');
     let str = '';
     if (errors.length > 0) {
       errors?.forEach((o) => {
-        str += Object.values(o?.constraints) ?? '参数异常';
+        str += `${Object.values(o?.constraints)};` ?? '参数异常';
       });
 
       const errorResponse = {

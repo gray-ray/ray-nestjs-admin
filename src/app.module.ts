@@ -12,6 +12,7 @@ import { ApplicationModule } from './application/application.module';
 import { HttpExceptionFilter } from 'core/filters/http-exception.filter';
 import { ValidationPipe } from 'core/pipes/validate.pipe';
 import { ResponseInterceptor } from 'core/interceptor/response.interceptor';
+import { AuthModule } from './auth/auth.module';
 
 // 全局模块 在根模引入后， 在其他模块使用userModule 不在需要在其他模块中导入userModule
 // imports 是最优的
@@ -44,8 +45,8 @@ import { ResponseInterceptor } from 'core/interceptor/response.interceptor';
     RoleModule,
     MenuModule,
     ApplicationModule,
+    AuthModule,
   ],
-  controllers: [],
   providers: [
     {
       provide: APP_FILTER,

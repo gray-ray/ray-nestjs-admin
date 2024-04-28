@@ -10,5 +10,6 @@ import { Role } from 'src/role/entities/role.entity';
   imports: [TypeOrmModule.forFeature([User, Role])],
   controllers: [UserController],
   providers: [UserService, MyLogger],
+  exports: [UserService], // used in auth.service.ts
 })
 export class UserModule {}
