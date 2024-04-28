@@ -3,6 +3,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { MyLogger } from 'core/middlewares/my-logger.service';
+import helmet from 'helmet';
+import csurf from 'csurf';
+import rateLimit from 'express-rate-limit'; //
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -26,6 +29,14 @@ async function bootstrap() {
       // disableErrorMessages: true, // 详细的错误 不会返回给用户
       // whitelist: true, // 传参中不需要的属性会自定删除
       transform: true, // 根据对象的 DTO 类自动将有效负载转换为对象类型
+    }),
+  );
+  app.use(helmet()); // 众所周知的 Web 漏洞的影响
+  app.use(csurf()); // CSRF保护
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // limit each IP to 100 requests per windowMs
     }),
   );
   await app.listen(3000);
