@@ -32,7 +32,7 @@ async function bootstrap() {
     }),
   );
   app.use(helmet()); // 众所周知的 Web 漏洞的影响
-  app.use(csurf()); // CSRF保护
+  // app.use(csurf()); // CSRF保护
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes

@@ -54,7 +54,7 @@ export class UserService {
       this.myLogger.log('用户创建成功');
     }
 
-    return res;
+    return null;
   }
 
   async getPage(query: QueryUserDto) {
@@ -85,16 +85,60 @@ export class UserService {
     const qb = await this.userRepository
       .createQueryBuilder('users')
       .addSelect('users.password')
+      .addSelect('users.username')
+      .addSelect('users.id')
+      .addSelect('roles.id', 'roleId') // 选择角色的ID
+      .leftJoin('users.roles', 'roles')
       .where('users.username = :username', { username })
-      .getOne();
+      .getRawMany();
 
-    if (!qb) return undefined;
+    // NOTE:  返回类似下面的数据结构
+    /**
+     * [
+  {
+    users_id: 3,
+    users_username: 'user1',
+    users_nickname: 'string',
+    users_status: 0,
+    users_create_time: 2024-05-15T03:24:41.000Z,
+    users_update_time: 2024-05-15T03:24:41.000Z,
+    users_email: '122988282@qq.com',
+    users_phone: 'string',
+    users_remark: 'user1',
+    users_password: '$2a$10$kc4UwG6pi0a2TMe7v.nQ2OE0R5qrGSas2dWQjFPdgSe7SqWGeVwDq',
+    roleId: 1,
+    password: '$2a$10$kc4UwG6pi0a2TMe7v.nQ2OE0R5qrGSas2dWQjFPdgSe7SqWGeVwDq'
+  },
+  {
+    users_id: 3,
+    users_username: 'user1',
+    users_nickname: 'string',
+    users_status: 0,
+    users_create_time: 2024-05-15T03:24:41.000Z,
+    users_update_time: 2024-05-15T03:24:41.000Z,
+    users_email: '122988282@qq.com',
+    users_phone: 'string',
+    users_remark: 'user1',
+    users_password: '$2a$10$kc4UwG6pi0a2TMe7v.nQ2OE0R5qrGSas2dWQjFPdgSe7SqWGeVwDq',
+    roleId: 2,
+    password: '$2a$10$kc4UwG6pi0a2TMe7v.nQ2OE0R5qrGSas2dWQjFPdgSe7SqWGeVwDq'
+  }
+]
+     */
 
-    return qb;
+    if (qb?.length <= 0) return undefined;
+
+    const first = qb[0];
+
+    const roleIds = qb?.map((o) => o?.roleId);
+    first.roleIds = roleIds;
+
+    console.log(first)
+    return first;
   }
 
   async update(updateUser: UpdateUserDto) {
-    const { id } = updateUser;
+    const { id, roleIds = [], ...reset } = updateUser;
 
     const exitsUser = await this.userRepository.findOne({
       where: { id },
@@ -104,17 +148,26 @@ export class UserService {
       throw new HttpException('用户不存在', HttpStatus.OK);
     }
 
-    // TODO: 角色 、产品
+    for (const key in reset) {
+      if (this.columnNames.includes(key)) {
+        exitsUser[key] = reset[key];
+      }
+    }
 
-    const newUser = this.userRepository.merge(exitsUser, updateUser);
+    let roles: Role[] = [];
+    if (roleIds?.length > 0) {
+      roles = await this.roleRepository.findBy({ id: In(roleIds) });
+      exitsUser.roles = roles;
+    }
 
-    const res = await this.userRepository.save(newUser);
+    // 使用 merge 方法合并实体时，它不会自动保存关联实体（例如 roles）。需要手动保存这些关联实体才能确保它们的变更生效。
+    const res = await this.userRepository.save(exitsUser);
 
     if (res) {
       this.myLogger.warn('用户信息修改');
     }
 
-    return res;
+    return null;
   }
 
   async remove(id: number) {
@@ -129,6 +182,6 @@ export class UserService {
     if (res) {
       this.myLogger.warn('用户删除');
     }
-    return res;
+    return null;
   }
 }

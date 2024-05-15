@@ -2,7 +2,7 @@ import { Module, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import envConfig from '../config/env';
-import { APP_FILTER, APP_PIPE, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE, APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
@@ -13,6 +13,7 @@ import { HttpExceptionFilter } from 'core/filters/http-exception.filter';
 import { ValidationPipe } from 'core/pipes/validate.pipe';
 import { ResponseInterceptor } from 'core/interceptor/response.interceptor';
 import { AuthModule } from './auth/auth.module';
+import { DynamicRolesGuard } from 'core/guard/dynamic-roles.guard';
 
 // 全局模块 在根模引入后， 在其他模块使用userModule 不在需要在其他模块中导入userModule
 // imports 是最优的
@@ -25,7 +26,6 @@ import { AuthModule } from './auth/auth.module';
       imports: [ConfigModule],
       inject: [ConfigService], //依赖注入 ConfigService
       useFactory: async (configService: ConfigService) => {
-        console.log(configService.get('DB_DATABASE'))
         return {
           type: 'mysql',
           host: configService.get('DB_HOST'),
@@ -59,6 +59,10 @@ import { AuthModule } from './auth/auth.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: DynamicRolesGuard,
     },
   ],
 })

@@ -3,6 +3,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   BeforeInsert,
+  BeforeUpdate,
   OneToMany,
   ManyToMany,
   JoinTable,
@@ -58,6 +59,8 @@ export class User {
   })
   roles: Role[];
 
+  // 插入 更新时触发
+  @BeforeUpdate()
   @BeforeInsert()
   async encryptPwd() {
     if (!this.password) return;

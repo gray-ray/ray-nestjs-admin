@@ -24,6 +24,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (isPublic) {
       return true;
     }
+    // TODO: 不同角色校验权限
     return super.canActivate(context);
   }
 
