@@ -5,6 +5,8 @@ import { IsNotEmpty } from 'class-validator';
 export class CreateApplicationDto {
   @IsNotEmpty({ message: 'appName字段不能为空' })
   appName: string;
+
+  roleIds: number[];
 }
 
 export class QueryApplicationDto extends PartialType(CreateApplicationDto) {

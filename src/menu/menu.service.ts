@@ -91,7 +91,7 @@ export class MenuService {
 
   // NOTE: 修改菜单，只能修改当前id 的菜单
   async update(updateMenu: UpdateMenuDto) {
-    const { id, parentId } = updateMenu;
+    const { id, parentId, ...reset } = updateMenu;
 
     let has = null;
     if (parentId) {
@@ -112,11 +112,13 @@ export class MenuService {
       throw new HttpException('菜单不存在', HttpStatus.OK);
     }
 
-    const newMenu = this.menuRepository.merge(exitsMenu, {
-      ...updateMenu,
-    });
+    for (const key in reset) {
+      if (this.columnNames.includes(key)) {
+        exitsMenu[key] = reset[key];
+      }
+    }
 
-    const res = await this.menuRepository.save(newMenu);
+    const res = await this.menuRepository.save(exitsMenu);
 
     if (res) {
       this.myLogger.warn('菜单信息修改');

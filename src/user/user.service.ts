@@ -133,7 +133,6 @@ export class UserService {
     const roleIds = qb?.map((o) => o?.roleId);
     first.roleIds = roleIds;
 
-    console.log(first)
     return first;
   }
 
@@ -154,9 +153,10 @@ export class UserService {
       }
     }
 
-    let roles: Role[] = [];
     if (roleIds?.length > 0) {
-      roles = await this.roleRepository.findBy({ id: In(roleIds) });
+      const roles: Role[] = await this.roleRepository.findBy({
+        id: In(roleIds),
+      });
       exitsUser.roles = roles;
     }
 

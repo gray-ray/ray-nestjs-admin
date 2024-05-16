@@ -17,6 +17,8 @@ export class CreateRoleDto {
   createTime: string;
 
   updateTime: string;
+
+  appIds: number[];
 }
 
 export class QueryRoleDto extends PartialType(CreateRoleDto) {

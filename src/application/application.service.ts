@@ -5,26 +5,34 @@ import {
   UpdateApplicationDto,
 } from './dto/application';
 
-import { Repository, TreeRepository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Application } from './entities/application.entity';
 import { MyLogger } from 'core/middlewares/my-logger.service';
 import { Menu } from 'src/menu/entities/menu.entity';
+import { Role } from 'src/role/entities/role.entity';
 
 @Injectable()
 export class ApplicationService {
+  columnNames: string[];
   constructor(
     @InjectRepository(Application)
     private readonly appRepository: Repository<Application>,
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
     @InjectRepository(Menu)
     private readonly menuRepository: Repository<Menu>,
     private readonly myLogger: MyLogger,
   ) {
     this.myLogger.setContext('appService');
+
+    // NOTE: 获取表结构字段
+    const metadata = this.appRepository.metadata;
+    this.columnNames = metadata.columns.map((column) => column.propertyName);
   }
 
   async create(createApplicationDto: CreateApplicationDto) {
-    const { appName } = createApplicationDto;
+    const { appName, roleIds = [] } = createApplicationDto;
     const exitsApp = await this.appRepository.findOne({
       where: { appName },
     });
@@ -32,7 +40,17 @@ export class ApplicationService {
       throw new HttpException('应用名称已存在', HttpStatus.OK);
     }
 
-    const newApp = this.appRepository.create({ appName });
+    let roles: Role[] = [];
+    if (roleIds?.length > 0) {
+      roles = await this.roleRepository.findBy({ id: In(roleIds) });
+    }
+
+    const params = {
+      roles,
+      appName,
+    };
+
+    const newApp = this.appRepository.create(params);
 
     const res = await this.appRepository.save(newApp).catch(() => false);
 
@@ -107,7 +125,7 @@ export class ApplicationService {
   }
 
   async update(updateApp: UpdateApplicationDto) {
-    const { appName } = updateApp;
+    const { appName, roleIds = [], ...reset } = updateApp;
 
     const exitsApp = await this.appRepository.findOne({
       where: { appName },
@@ -117,11 +135,22 @@ export class ApplicationService {
       throw new HttpException('应用不存在', HttpStatus.OK);
     }
 
-    // TODO: 角色 、产品
+    exitsApp.appName = appName;
 
-    const newApp = this.appRepository.merge(exitsApp, updateApp);
+    for (const key in reset) {
+      if (this.columnNames.includes(key)) {
+        exitsApp[key] = reset[key];
+      }
+    }
 
-    const res = await this.appRepository.save(newApp);
+    if (roleIds?.length > 0) {
+      const roles: Role[] = await this.roleRepository.findBy({
+        id: In(roleIds),
+      });
+      exitsApp.roles = roles;
+    }
+
+    const res = await this.appRepository.save(exitsApp);
 
     if (res) {
       this.myLogger.warn('应用信息修改');

@@ -4,9 +4,11 @@ import {
   PrimaryGeneratedColumn,
   BeforeInsert,
   OneToMany,
+  JoinTable,
   ManyToMany,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { Application } from 'src/application/entities/application.entity';
 
 @Entity('roles')
 export class Role {
@@ -45,4 +47,10 @@ export class Role {
 
   @ManyToMany(() => User, (user) => user.roles)
   users: User[];
+
+  @ManyToMany(() => Application, (app) => app.roles, { lazy: true })
+  @JoinTable({
+    name: 'roles_apps',
+  })
+  apps: Application[];
 }

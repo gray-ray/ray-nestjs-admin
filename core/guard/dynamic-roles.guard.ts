@@ -34,9 +34,8 @@ export class DynamicRolesGuard implements CanActivate {
 
     try {
       const decoded: any = jwt.verify(tokenValue, secret); // { username: 'user1', id: 3,role: '1,2,3', }
-      console.log(decoded);
       // TODO: 用户角色信息判断是否有权限触发当前路由
-      // request.user = decoded; // 将用户信息附加到请求对象中
+
       return true; // 授权成功
     } catch (error) {
       return false; // token 解码失败，拒绝访问

@@ -1,9 +1,10 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { CreateRoleDto, UpdateRoleDto, QueryRoleDto } from './dto/role.dto';
 import { MyLogger } from 'core/middlewares/my-logger.service';
 import { Role } from './entities/role.entity';
+import { Application } from 'src/application/entities/application.entity';
 
 @Injectable()
 export class RoleService {
@@ -12,6 +13,8 @@ export class RoleService {
   constructor(
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
+    @InjectRepository(Application)
+    private readonly appRepository: Repository<Application>,
     private readonly myLogger: MyLogger,
   ) {
     // NOTE: 设置日志标识
@@ -24,13 +27,26 @@ export class RoleService {
   }
 
   async create(createRole: CreateRoleDto) {
-    const { roleName } = createRole;
+    const { roleName, appIds = [], ...reset } = createRole;
 
     const has = await this.roleRepository.findOne({ where: { roleName } });
     if (has) {
       throw new HttpException('角色已存在', HttpStatus.OK);
     }
-    const newRole = await this.roleRepository.create(createRole);
+
+    let apps: Application[] = [];
+
+    if (appIds?.length > 0) {
+      apps = await this.appRepository.findBy({ id: In(appIds) });
+    }
+
+    const params = {
+      apps,
+      roleName,
+      ...reset,
+    };
+
+    const newRole = await this.roleRepository.create(params);
 
     const res = await this.roleRepository.save(newRole);
     if (res) {
@@ -64,7 +80,7 @@ export class RoleService {
   }
 
   async update(updateRole: UpdateRoleDto) {
-    const { id } = updateRole;
+    const { id, appIds = [], ...reset } = updateRole;
 
     const exitsRole = await this.roleRepository.findOne({
       where: { id },
@@ -74,9 +90,20 @@ export class RoleService {
       throw new HttpException('角色不存在', HttpStatus.OK);
     }
 
-    const newRole = this.roleRepository.merge(exitsRole, updateRole);
+    for (const key in reset) {
+      if (this.columnNames.includes(key)) {
+        exitsRole[key] = updateRole[key];
+      }
+    }
 
-    const res = await this.roleRepository.save(newRole);
+    if (appIds?.length > 0) {
+      const apps: Application[] = await this.appRepository.findBy({
+        id: In(appIds),
+      });
+      exitsRole.apps = apps;
+    }
+
+    const res = await this.roleRepository.save(exitsRole);
 
     if (res) {
       this.myLogger.warn('角色信息修改');
