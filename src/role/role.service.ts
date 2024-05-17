@@ -126,4 +126,10 @@ export class RoleService {
     }
     return res;
   }
+
+  async getRoleAuth(roleIds: number[]) {
+    const has = await this.roleRepository.findBy({ id: In(roleIds) });
+    // 
+    return true;
+  }
 }
