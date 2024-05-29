@@ -1,0 +1,26 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_DATABASE: ray-nestjs-admin
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  nestjs-app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - .:/home/ray/workspace/nestjs-admin
+      - /home/ray/workspace/nestjs-admin/node_modules
+
+volumes:
+  mysql-data:
