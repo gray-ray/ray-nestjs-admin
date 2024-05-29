@@ -8,13 +8,22 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, QueryUserDto, UpdateUserDto } from './dto/user.dto';
+import { Public } from 'core/decorators/public.decorator';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('create')
+  @Public()
+  @ApiExcludeEndpoint() // 接口在文档中隐藏
+  @Post('noAuthCreate')
   create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
+  }
+
+  @Post('create')
+  createWithAuth(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
