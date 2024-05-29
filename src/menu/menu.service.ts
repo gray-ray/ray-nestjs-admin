@@ -63,7 +63,11 @@ export class MenuService {
       newObj.parent = has;
     }
 
-    const res = await this.menuRepository.save(newObj);
+    const res = await this.menuRepository.manager.transaction(
+      async (manager) => {
+        return await manager.save(Menu, newObj);
+      },
+    );
 
     return res;
   }
@@ -118,7 +122,11 @@ export class MenuService {
       }
     }
 
-    const res = await this.menuRepository.save(exitsMenu);
+    const res = await this.menuRepository.manager.transaction(
+      async (manager) => {
+        return await manager.save(Menu, exitsMenu);
+      },
+    );
 
     if (res) {
       this.myLogger.warn('菜单信息修改');
@@ -135,7 +143,12 @@ export class MenuService {
     if (!exitsMenu) {
       throw new HttpException('菜单不存在', HttpStatus.OK);
     }
-    const res = await this.menuRepository.remove(exitsMenu);
+
+    const res = await this.menuRepository.manager.transaction(
+      async (manager) => {
+        return await manager.remove(Menu, exitsMenu);
+      },
+    );
     if (res) {
       this.myLogger.warn('菜单删除');
     }

@@ -46,9 +46,13 @@ export class RoleService {
       ...reset,
     };
 
-    const newRole = await this.roleRepository.create(params);
+    const res = await this.roleRepository.manager.transaction(
+      async (manager) => {
+        const newRole = manager.create(Role, params);
+        return await manager.save(Role, newRole);
+      },
+    );
 
-    const res = await this.roleRepository.save(newRole);
     if (res) {
       this.myLogger.log('角色创建成功');
     }
@@ -103,7 +107,11 @@ export class RoleService {
       exitsRole.apps = apps;
     }
 
-    const res = await this.roleRepository.save(exitsRole);
+    const res = await this.roleRepository.manager.transaction(
+      async (manager) => {
+        return await manager.save(Role, exitsRole);
+      },
+    );
 
     if (res) {
       this.myLogger.warn('角色信息修改');
@@ -120,7 +128,12 @@ export class RoleService {
     if (!exitsRole) {
       throw new HttpException('角色不存在', HttpStatus.OK);
     }
-    const res = await this.roleRepository.remove(exitsRole);
+
+    const res = await this.roleRepository.manager.transaction(
+      async (manager) => {
+        return await manager.remove(Role, exitsRole);
+      },
+    );
     if (res) {
       this.myLogger.warn('角色删除');
     }

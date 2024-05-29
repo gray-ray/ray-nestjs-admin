@@ -46,9 +46,12 @@ export class UserService {
       ...reset,
     };
 
-    const newUser = await this.userRepository.create(params);
-
-    const res = await this.userRepository.save(newUser);
+    const res = await this.userRepository.manager.transaction(
+      async (manager) => {
+        const newUser = manager.create(User, params);
+        return await manager.save(User, newUser);
+      },
+    );
 
     if (res) {
       this.myLogger.log('用户创建成功');
@@ -161,7 +164,11 @@ export class UserService {
     }
 
     // 使用 merge 方法合并实体时，它不会自动保存关联实体（例如 roles）。需要手动保存这些关联实体才能确保它们的变更生效。
-    const res = await this.userRepository.save(exitsUser);
+    const res = await this.userRepository.manager.transaction(
+      async (manager) => {
+        return await manager.save(User, exitsUser);
+      },
+    );
 
     if (res) {
       this.myLogger.warn('用户信息修改');
@@ -178,7 +185,12 @@ export class UserService {
     if (!exitsUser) {
       throw new HttpException('用户不存在', HttpStatus.OK);
     }
-    const res = await this.userRepository.remove(exitsUser);
+
+    const res = await this.userRepository.manager.transaction(
+      async (manager) => {
+        return await manager.remove(User, exitsUser);
+      },
+    );
     if (res) {
       this.myLogger.warn('用户删除');
     }

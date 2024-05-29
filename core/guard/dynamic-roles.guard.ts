@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { secret } from 'src/auth/constants';
-import { RoleService } from 'src/role/role.service';
+// import { RoleService } from 'src/role/role.service';
 import { IS_PUBLIC_KEY } from 'core/decorators/public.decorator';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class DynamicRolesGuard implements CanActivate {
   private readonly whitelistRoutes: string[] = ['auth/login/*']; // 定义路由白名单
   constructor(
     private reflector: Reflector,
-    private roleService: RoleService,
+    // private roleService: RoleService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -38,8 +38,8 @@ export class DynamicRolesGuard implements CanActivate {
     try {
       const decoded: any = jwt.verify(tokenValue, secret); // { username: 'user1', id: 3,role: '1,2,3', }
       // TODO: 用户角色信息判断是否有权限触发当前路由
-      const res = await this.roleService.getRoleAuth(decoded?.role?.split(','));
-      return res;
+      // const res = await this.roleService.getRoleAuth(decoded?.role?.split(','));
+      return true;
     } catch (error) {
       return false; // token 解码失败，拒绝访问
     }

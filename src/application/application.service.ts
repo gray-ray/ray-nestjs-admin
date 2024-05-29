@@ -50,9 +50,12 @@ export class ApplicationService {
       appName,
     };
 
-    const newApp = this.appRepository.create(params);
-
-    const res = await this.appRepository.save(newApp).catch(() => false);
+    const res = await this.appRepository.manager.transaction(
+      async (manager) => {
+        const newApp = manager.create(Application, params);
+        return await manager.save(Application, newApp);
+      },
+    );
 
     if (res) {
       this.myLogger.log('应用创建');
@@ -150,7 +153,12 @@ export class ApplicationService {
       exitsApp.roles = roles;
     }
 
-    const res = await this.appRepository.save(exitsApp);
+    const res = await this.appRepository.manager.transaction(
+      async (manager) => {
+        return await manager.save(Application, exitsApp);
+      },
+    );
+
 
     if (res) {
       this.myLogger.warn('应用信息修改');
@@ -167,7 +175,13 @@ export class ApplicationService {
     if (!exitsApp) {
       throw new HttpException('应用不存在', HttpStatus.OK);
     }
-    const res = await this.appRepository.remove(exitsApp);
+
+    const res = await this.appRepository.manager.transaction(
+      async (manager) => {
+        return await manager.remove(Application, exitsApp);
+      },
+    );
+
     if (res) {
       this.myLogger.warn('应用删除');
     }
