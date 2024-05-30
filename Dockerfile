@@ -10,11 +10,11 @@ COPY package*.json ./
 # 安装依赖，包括 PM2
 RUN npm install
 
-# 复制当前目录下所有文件到工作目录
-COPY . .
-
 # 构建 NestJS 项目
 RUN npm run build
+
+# 复制当前目录下所有文件到工作目录
+COPY . .
 
 # 全局安装 PM2
 RUN npm install pm2 -g

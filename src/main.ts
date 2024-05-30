@@ -39,6 +39,7 @@ async function bootstrap() {
       max: 100, // limit each IP to 100 requests per windowMs
     }),
   );
+  app.setGlobalPrefix('admin');
   await app.listen(3000);
 }
 bootstrap();
