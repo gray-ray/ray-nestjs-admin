@@ -6,6 +6,7 @@ WORKDIR /home/ray/workspace
 
 # 复制 package.json 和 package-lock.json 到工作目录
 COPY package*.json ./
+COPY tsconfig*.json ./
 
 # 安装依赖，包括 PM2
 RUN npm install
