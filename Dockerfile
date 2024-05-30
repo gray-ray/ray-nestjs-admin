@@ -28,7 +28,7 @@ RUN npm install pm2 -g
 ENV NODE_ENV=production
 
 # 暴露应用运行的端口
-EXPOSE 3300
+EXPOSE 3000
 
 # 启动 NestJS 应用，使用 PM2
 CMD ["pm2-runtime", "start", "ecosystem.config.js", "--env", "production"]
