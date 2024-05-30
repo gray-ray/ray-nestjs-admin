@@ -11,11 +11,15 @@ COPY tsconfig*.json ./
 # 安装依赖，包括 PM2
 RUN npm install
 
-# 构建 NestJS 项目
-RUN npm run build
 
 # 复制当前目录下所有文件到工作目录
 COPY . .
+
+# 构建 NestJS 项目
+RUN npm run build
+
+# 调试构建输出
+RUN ls -al /home/ray/workspace/dist
 
 # 全局安装 PM2
 RUN npm install pm2 -g
