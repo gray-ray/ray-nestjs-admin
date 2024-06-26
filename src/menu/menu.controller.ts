@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Query, Delete, ParseIntPipe,Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Query, Delete, ParseIntPipe,Param, HttpCode } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { CreateMenuDto, UpdateMenuDto, QueryMenuDto } from './dto/menu.dto';
 
@@ -8,11 +8,13 @@ export class MenuController {
 
 
   @Post('create')
+  @HttpCode(200)
   create(@Body() createMenuDto: CreateMenuDto) {
     return this.menuService.create(createMenuDto);
   }
 
   @Post('trees')
+  @HttpCode(200)
   getTrees() {
     return this.menuService.getTrees();
   }
@@ -23,6 +25,7 @@ export class MenuController {
   }
 
   @Post('update')
+  @HttpCode(200)
   update(@Body() updateMenuDto: UpdateMenuDto) {
     return this.menuService.update(updateMenuDto);
   }

@@ -78,6 +78,13 @@ export class RoleService {
     return { list, total };
   }
 
+  async getAll() {
+ 
+    const list = await this.roleRepository.createQueryBuilder('roles').getMany();
+
+    return list ;
+  }
+
   async findOne(id: number) {
     const res = await this.roleRepository.findOne({ where: { id } });
     return res;

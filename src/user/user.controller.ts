@@ -5,6 +5,7 @@ import {
   Get,
   ParseIntPipe,
   Param,
+  HttpCode
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, QueryUserDto, UpdateUserDto } from './dto/user.dto';
@@ -18,16 +19,19 @@ export class UserController {
   @Public()
   @ApiExcludeEndpoint() // 接口在文档中隐藏
   @Post('noAuthCreate')
+  @HttpCode(200)
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
   @Post('create')
+  @HttpCode(200)
   createWithAuth(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
   @Post('list')
+  @HttpCode(200)
   getPage(@Body() queryUserDto: QueryUserDto) {
     return this.userService.getPage(queryUserDto);
   }
@@ -38,6 +42,7 @@ export class UserController {
   }
 
   @Post('update')
+  @HttpCode(200)
   update(@Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(updateUserDto);
   }

@@ -32,7 +32,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     // user { id: string, username: string }
     // 您可以基于 "info" 或 "err" 参数抛一个错误
     if (err || !user) {
-      throw err || new UnauthorizedException('用户未登录');
+      if (info?.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token expired');
+      } else {
+        throw err || new UnauthorizedException('用户未登录');
+      }
     }
     return user;
   }

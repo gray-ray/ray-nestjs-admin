@@ -9,7 +9,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import { Role } from 'src/role/entities/role.entity';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose, Transform  } from 'class-transformer';
 import { hashSync } from 'bcryptjs';
 
 @Entity('users')
@@ -24,7 +24,7 @@ export class User {
   @Column({ select: false, nullable: true })
   password: string;
 
-  @Column({ length: 30 })
+  @Column({ length: 30,default: '' })
   nickname: string;
 
   @Column()
@@ -44,16 +44,18 @@ export class User {
   })
   updateTime: Date;
 
-  @Column()
+  @Column({default: ''})
   email: string;
 
-  @Column({ length: 11 })
+  @Column({ length: 11, default: '' })
   phone: string;
 
-  @Column()
+  @Column({default: ''})
   remark: string;
 
-  @ManyToMany(() => Role, (role) => role.users, { lazy: true })
+  // NOTE:  通过懒加载方式防止循环引入需要注意, roles返回的是一个promise对象需要处理
+  // 在 User 实体中，roles 属性被定义为懒加载（eager: false）。这意味着在默认情况下，roles 属性不会自动加载，我们需要显式地加载它们
+  @ManyToMany(() => Role, (role) => role.users, { lazy: true, })
   @JoinTable({
     name: 'users_roles',
   })
@@ -66,4 +68,6 @@ export class User {
     if (!this.password) return;
     this.password = hashSync(this.password, 10);
   }
-}
+
+
+} 

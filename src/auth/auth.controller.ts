@@ -4,6 +4,7 @@ import {
   Req,
   UseInterceptors,
   UseGuards,
+  HttpCode
 } from '@nestjs/common';
 import { CustomResponse } from 'core/decorators/custom.decorator';
 import { AuthService } from './auth.service';
@@ -19,6 +20,7 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
+  @HttpCode(200)
   @CustomResponse() // 重写全局返回拦截器
   @UseInterceptors(ResponseInterceptor) // 重写全局返回拦截器
   signIn(@Req() req) {

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, ParseIntPipe,Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, ParseIntPipe,Param, HttpCode } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import {
   CreateApplicationDto,
@@ -11,11 +11,13 @@ export class ApplicationController {
   constructor(private readonly applicationService: ApplicationService) {}
 
   @Post('create')
+  @HttpCode(200)
   create(@Body() createApplicationDto: CreateApplicationDto) {
     return this.applicationService.create(createApplicationDto);
   }
 
   @Post('list')
+  @HttpCode(200)
   getPage(@Body() queryAppDto: QueryApplicationDto) {
     return this.applicationService.getPage(queryAppDto);
   }
@@ -31,6 +33,7 @@ export class ApplicationController {
   }
 
   @Post('update')
+  @HttpCode(200)
   update(@Body() updateApplicationDto: UpdateApplicationDto) {
     return this.applicationService.update(updateApplicationDto);
   }

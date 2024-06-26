@@ -60,10 +60,10 @@ import { DynamicRolesGuard } from 'core/guard/dynamic-roles.guard';
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
     },
-    {
-      provide: APP_GUARD,
-      useClass: DynamicRolesGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: DynamicRolesGuard,
+    // },
   ],
 })
 export class AppModule {}
