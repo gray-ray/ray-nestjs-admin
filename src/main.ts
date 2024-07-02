@@ -13,6 +13,12 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  })
+
   const options = new DocumentBuilder()
     .setTitle('ray-nestjs-admin')
     .setDescription('基于nestjs实现的管理系统')

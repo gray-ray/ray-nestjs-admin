@@ -23,9 +23,15 @@ export class ApplicationController {
   }
 
   @Get('all')
-  getAll(@Query('name') name: string) {
+  getAll(@Query('name') name?: string) {
     return this.applicationService.getAll(name);
   }
+
+  @Get('detail/:appId')
+  getDetail(@Param('appId', ParseIntPipe) appId: number) {
+    return this.applicationService.findOne(appId);
+  }
+
 
   @Get('menus/:appId')
   getMenusTree(@Param('appId', ParseIntPipe) appId: number) {
@@ -38,7 +44,7 @@ export class ApplicationController {
     return this.applicationService.update(updateApplicationDto);
   }
 
-  @Get('remove/:id')
+  @Get('delete/:id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.applicationService.remove(id);
   }

@@ -60,6 +60,19 @@ export class RoleService {
     return res;
   }
 
+   // NOTE:  通过懒加载方式防止循环引入需要注意, roles返回的是一个promise对象需要处理
+  // 处理用户数据的方法
+  private async transformRole(role: Role) {
+    const { apps,  ...result } = role;
+    const appsArray = await apps;
+    const appIds = (appsArray || []).map(a => a.id); 
+
+     //@ts-ignore
+     //在 typeorm 中，当我们执行查询时，返回的实体对象通常包含所有属性，包括关系字段。为了确保返回的数据中不包含 __roles__，可以手动删除这些字段或者通过序列化的方法过滤它们
+     delete result.__apps__;
+    return { ...result, appIds }; // 返回所有非密码属性和 roleIds
+  }
+
   async getPage(query: QueryRoleDto) {
     const { pageNum = 1, pageSize = 10, ...reset } = query;
     const qb = await this.roleRepository.createQueryBuilder('roles');
@@ -75,7 +88,10 @@ export class RoleService {
       .skip(pageSize * (pageNum - 1))
       .getManyAndCount();
 
-    return { list, total };
+
+    const final = await Promise.all(list.map(o => this.transformRole(o))) 
+    return { list: final, total };
+
   }
 
   async getAll() {
@@ -86,8 +102,12 @@ export class RoleService {
   }
 
   async findOne(id: number) {
-    const res = await this.roleRepository.findOne({ where: { id } });
-    return res;
+    const res = await this.roleRepository.createQueryBuilder('roles')
+    .leftJoinAndSelect('roles.apps', 'apps')
+    .andWhere(`roles.id = :id`, {id}).getOne();
+
+    const final = await  this.transformRole(res);
+    return final;
   }
 
   async update(updateRole: UpdateRoleDto) {

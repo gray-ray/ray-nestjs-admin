@@ -6,6 +6,10 @@ export class CreateApplicationDto {
   @IsNotEmpty({ message: 'appName字段不能为空' })
   appName: string;
 
+  status: boolean;
+
+  remark: string;
+
   roleIds: number[];
 }
 

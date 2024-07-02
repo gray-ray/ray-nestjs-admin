@@ -38,7 +38,7 @@ export class RoleController {
   }
 
   @Get('delete/:id')
-  delete(@Query('id', ParseIntPipe) id: number) {
+  delete(@Param('id', ParseIntPipe) id: number) {
     return this.roleService.remove(id);
   }
 }

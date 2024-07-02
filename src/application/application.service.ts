@@ -32,7 +32,7 @@ export class ApplicationService {
   }
 
   async create(createApplicationDto: CreateApplicationDto) {
-    const { appName, roleIds = [] } = createApplicationDto;
+    const { appName, roleIds = [], ...reset } = createApplicationDto;
     const exitsApp = await this.appRepository.findOne({
       where: { appName },
     });
@@ -48,6 +48,7 @@ export class ApplicationService {
     const params = {
       roles,
       appName,
+      ...reset
     };
 
     const res = await this.appRepository.manager.transaction(
@@ -64,22 +65,41 @@ export class ApplicationService {
     return res;
   }
 
-  async getPage(query: QueryApplicationDto) {
-    const { pageNum = 1, pageSize = 10, appName } = query;
-    const qb = await this.appRepository.createQueryBuilder('application');
+     // NOTE:  通过懒加载方式防止循环引入需要注意, roles返回的是一个promise对象需要处理
+  // 处理用户数据的方法
+  private async transformRole(app: Application) {
+    const { roles,  ...result } = app;
+    const array = await roles;
+    const roleIds = (array || []).map(a => a.id); 
 
-    if (appName) {
-      qb.andWhere(`application.appName LIKE :appName`, {
-        appName: `%${appName}%`,
-      });
+     //@ts-ignore
+     //在 typeorm 中，当我们执行查询时，返回的实体对象通常包含所有属性，包括关系字段。为了确保返回的数据中不包含 __roles__，可以手动删除这些字段或者通过序列化的方法过滤它们
+     delete result.__roles__;
+    return { ...result, roleIds }; // 返回所有非密码属性和 roleIds
+  }
+
+
+  async getPage(query: QueryApplicationDto) {
+    const { pageNum = 1, pageSize = 10, ...reset  } = query;
+    const qb = await this.appRepository.createQueryBuilder('application')
+    .leftJoinAndSelect('application.roles', 'roles');
+
+    for (const key in reset) {
+      if (this.columnNames.includes(key)) {
+        qb.andWhere(`application.${key} LIKE :${key}`, { [key]: `%${reset[key]}%` });
+      }
     }
+
 
     const [list, total] = await qb
       .take(pageSize)
       .skip(pageSize * (pageNum - 1))
       .getManyAndCount();
+      
+      const final = await Promise.all(list.map(o => this.transformRole(o))) 
 
-    return { list, total };
+      return { list: final, total };
+
   }
 
   async getAll(appName?: string) {
@@ -187,4 +207,18 @@ export class ApplicationService {
     }
     return res;
   }
+
+
+  async findOne(id: number) {
+    const res = await this.appRepository.createQueryBuilder('applications')
+    .leftJoinAndSelect('applications.roles', 'roles')
+    .andWhere(`applications.id = :id`, {id}).getOne();
+
+    const final = await  this.transformRole(res);
+    return final;
+  }
+
+  
 }
+
+

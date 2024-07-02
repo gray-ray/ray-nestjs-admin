@@ -48,7 +48,7 @@ export class Role {
   @ManyToMany(() => User, (user) => user.roles)
   users: User[];
 
-  @ManyToMany(() => Application, (app) => app.roles, { lazy: true })
+  @ManyToMany(() => Application, (app) => app.roles, { lazy: true, eager: false })
   @JoinTable({
     name: 'roles_apps',
   })

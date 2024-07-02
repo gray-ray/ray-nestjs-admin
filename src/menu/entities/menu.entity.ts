@@ -22,7 +22,7 @@ export class Menu {
   @Column({ name: 'menu_name', length: 30 })
   menuName: string;
 
-  @Column()
+  @Column({default: ''})
   type: string;
 
   @Column({ name: 'sort_num' })
