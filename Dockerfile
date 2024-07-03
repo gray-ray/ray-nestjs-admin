@@ -1,7 +1,7 @@
 
 
 # 使用官方的 Node.js 镜像作为基础镜像
-FROM registry.cn-hangzhou.aliyuncs.com/node:18-alpine
+FROM node:18-alpine
 
 # 设置工作目录
 WORKDIR /home/ray/workspace
