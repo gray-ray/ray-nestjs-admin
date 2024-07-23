@@ -4,7 +4,6 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { MyLogger } from 'core/middlewares/my-logger.service';
 import helmet from 'helmet';
-import csurf from 'csurf';
 import rateLimit from 'express-rate-limit'; //
 
 async function bootstrap() {
@@ -38,7 +37,7 @@ async function bootstrap() {
     }),
   );
   app.use(helmet()); // 众所周知的 Web 漏洞的影响
-  // app.use(csurf()); // CSRF保护
+
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
